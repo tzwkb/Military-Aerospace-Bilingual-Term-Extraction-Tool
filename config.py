@@ -101,7 +101,7 @@ EXTRACTION_MODE = {
 }
 
 # 系统提示词
-SYSTEM_PROMPT = """You are a senior unmanned aircraft systems (UAS/UAV) terminology extraction specialist with extensive expertise in unmanned aerial vehicles, aviation systems, flight control, communications, payloads, and aerospace standards. Your mission is to extract precise technical terminology from UAS/UAV documentation and standards, building comprehensive bilingual terminology databases with maximum accuracy and adherence to international aviation terminology standards."""
+SYSTEM_PROMPT = """You are a senior scientific terminology extraction specialist with extensive expertise in academic journals, research publications, and multilingual scholarly terminology. Your mission is to extract precise bilingual keyword pairs from scientific literature across all disciplines, building comprehensive terminology databases that reflect the actual keywords used by researchers and authors."""
 
 def get_user_prompt(text: str, bilingual: bool = True) -> str:
     """
@@ -115,25 +115,33 @@ def get_user_prompt(text: str, bilingual: bool = True) -> str:
         str: 格式化的用户提示词模板
     """
     if bilingual:
-        # 双语模式 - 无人驾驶航空器系统专用  
-        return f"""Extract bilingual UAS/UAV terminology from GB/T 38152-2019 standard.
+        # 双语模式 - 适用于科学期刊关键词提取
+        return f"""Extract bilingual keyword terminology pairs from scientific journal articles.
 
 DOCUMENT STRUCTURE:
-- GB/T national standard for Unmanned Aircraft System (UAS) terminology
-- Format: Section number (e.g., 2.1, 3.2.1, 7.1.5) + Chinese term + English term + definition
-- Example: "3.2.1  无人驾驶航空器  unmanned aircraft  A powered aircraft that does not carry a human operator..."
+- Scientific journal articles with keyword sections
+- Common formats:
+  * "关键词: 术语1; 术语2; 术语3" / "Keywords: term1; term2; term3"
+  * "关键词：术语1，术语2，术语3" / "Keywords: term1, term2, term3"
+  * Keywords may appear in abstract, header, or dedicated section
+- Keywords represent core concepts, methods, or subject areas of the research
 
 EXTRACTION RULES:
-- Extract BOTH Chinese and English for each term
-- For acronyms: include full form (e.g., "UAS, Unmanned Aircraft System" / "无人驾驶航空器系统")
-- Extract UAS/UAV terminology: aircraft types, operations, control, communications, payloads, launch/recovery, airspace, personnel, safety
+- **PRIMARY SOURCE**: Extract terms from "关键词/Keywords" sections (highest priority)
+- **SECONDARY SOURCE**: Extract key technical terms from title, abstract, or main text
+- Match Chinese and English keyword pairs based on position, context, and semantic equivalence
+- Preserve original terminology exactly as authored
+- Include compound terms and multi-word expressions
+- Handle various separators: semicolons (;), commas (，,), pipes (|)
+- Cross-disciplinary: medicine, engineering, physics, biology, computer science, social sciences, etc.
+- Focus on domain-specific technical terms, methodologies, and core concepts
 
 JSON OUTPUT:
 {{{{
   "terms": [
     {{{{
-      "eng_term": "English term (expand acronyms)",
-      "zh_term": "中文术语（展开缩写）"
+      "eng_term": "English keyword",
+      "zh_term": "中文关键词"
     }}}}
   ]
 }}}}
@@ -141,21 +149,25 @@ JSON OUTPUT:
 TEXT TO PROCESS:
 {text}"""
     else:
-        # 单语模式 - 无人驾驶航空器系统专用
-        return f"""Extract UAS/UAV terminology from GB/T standard documents.
+        # 单语模式 - 提取单一语言关键词
+        return f"""Extract keyword terminology from scientific journal articles.
 
-DOCUMENT FORMAT: GB/T terminology standard with numbered sections.
+DOCUMENT FORMAT: Academic journal article with keyword section.
 
 EXTRACTION RULES:
-- Extract UAS/UAV technical terms
-- For acronyms: include full form (e.g., "UAS (Unmanned Aircraft System)" or "视距内运行 (VLOS)")
-- Focus: aircraft types, operations, control, communications, payloads, launch/recovery, airspace
+- **PRIMARY SOURCE**: Extract from "Keywords/关键词" section
+- **SECONDARY SOURCE**: Extract key technical terms from title, abstract, or text
+- Preserve original terminology exactly as authored
+- Include compound terms and multi-word expressions
+- Handle separators: semicolons (;), commas (，,), pipes (|)
+- All scientific disciplines accepted
+- Focus on domain-specific technical terms and core concepts
 
 JSON OUTPUT:
 {{{{
   "terms": [
     {{{{
-      "term": "Term (expand acronyms)"
+      "term": "Keyword term"
     }}}}
   ]
 }}}}
